@@ -1,5 +1,6 @@
 ﻿using System;
 using Spectre.Console;
+using System.Text.Json;
 
 class Recipe
 {
@@ -23,9 +24,34 @@ class Recipe
         Categories = new List<string>();
         Ingredients = "";
     }
+
+
 }
 class Operations
 {
+    private string _file;
+    public Operations()
+    {
+        var _Path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+        _file = Path.Combine(_Path, "Dats.json");
+        if(File.Exists(_file) == false)
+        {
+            Recipes = new List<Recipe>();
+            File.WriteAllText(_file, JsonSerializer.Serialize(Recipes));
+        }
+        else
+        {
+            using (StreamReader r = new StreamReader(_file))
+            {
+                var Data = r.ReadToEnd();
+                var Json = JsonSerializer.Deserialize<List<Recipe>>(Data);
+                if(Json != null)
+                {
+                    Recipes = Json;
+                }
+            }
+        }
+    }
     public List<Recipe> Recipes { get; set; }
 
     public List<Recipe> ListRecipes() { return Recipes; }
@@ -80,7 +106,7 @@ class Operations
     public void EditRecipe()
     {
         Console.WriteLine("Enter the Id of the Recipe you want to edit");
-        Guid Id = Convert.ChangeType(Console.ReadLine(), Guid)
+        //Guid Id = Convert.ChangeType(Console.ReadLine(), Guid)
 ;        Console.WriteLine("What you would like to change ?");
         int Choice = Convert.ToInt32(Console.ReadLine());
 
@@ -91,7 +117,11 @@ class Operations
         if (Choice == 1) {
             Console.WriteLine("Enter the new Title");
             string NewTitle = Console.ReadLine();
-            EditTitle(Id, NewTitle);
+           // EditTitle(Id, NewTitle);
         } 
+    }
+    public void SaveRecipe()
+    {
+        File.WriteAllText(_file, JsonSerializer.Serialize(Recipes));
     }
 }
