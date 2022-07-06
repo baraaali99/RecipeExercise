@@ -5,7 +5,7 @@ using RecipeExercise;
 using System.Text;
 
 var recipesList = new List<Recipe>();
-List<string> categoriesList = null;
+var categoriesList = new List<string>();
 var _Path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 string _file = Path.Combine(_Path, "D:\\computer science\\Silverkey\\RecipeExercise\\RecipeExercise\\Recipes.json");
 if (File.Exists(_file) == false)
@@ -65,7 +65,7 @@ while (true)
 			AddCategory();
 			break;
 		case "Edit a Category":
-			//EditCategory();
+			EditCategory();
 			break;
 		default:
 			Save();
@@ -93,7 +93,7 @@ void AddRecipe()
 	var instruction = AnsiConsole.Ask<string>("[green]Enter recipe instructions please:[/] ");
 	while (instruction != "")
 	{
-		r.Instructions.Add(instruction);
+		instructions.Add(instruction);
 		instruction = AnsiConsole.Prompt(new TextPrompt<string>("[green]Enter recipe instructions please:[/] ").AllowEmpty());
 		
 	};
@@ -106,7 +106,7 @@ void AddRecipe()
 		Categories = categories
 	};
 
-	if (categoriesList == null)
+	if (categoriesList.Count == 0)
 	{
 		AnsiConsole.MarkupLine("[red]please add Categories your recipes can belong to[/]");
 		recipe.Categories.Add("[red]not assigned to specific Category yet[/]");
@@ -122,9 +122,8 @@ void AddRecipe()
 		.AddChoices(categoriesList));
 
 		recipe.Categories = selectedcategories;
-
-		recipesList.Add(recipe);
 	}
+	recipesList.Add(recipe);
 }
 
 void RemoveRecipe()
@@ -151,9 +150,9 @@ void RemoveRecipe()
 // incomplete
 void EditRecipe()
 {
-	if (recipesList.ElementAt(0) == null)
+	if (recipesList.Count == 0)
 	{
-		AnsiConsole.MarkupLine("[red]There are no Categories[/]");
+		AnsiConsole.MarkupLine("[red]There are no recipes to [/]");
 		return;
 	}
 
@@ -181,7 +180,7 @@ void EditRecipe()
 			break;
 		case "Edit Ingredients":
 			chosenRecipe.Ingredients.Clear();
-			AnsiConsole.MarkupLine("Enter all the [green]ingredients[/]. Once done, leave the ingredient field [red]empty[/] and press enter");
+			AnsiConsole.MarkupLine("Enter all the [green]ingredients[/]. [red] after you're done of writing instructions press space to move to next step [/]");
 			var ingredient = AnsiConsole.Ask<string>("Enter ingredient: ");
 			while (ingredient != "")
 			{
@@ -191,7 +190,7 @@ void EditRecipe()
 			break;
 		case "Edit Instructions":
 			chosenRecipe.Instructions.Clear();
-			AnsiConsole.MarkupLine("Enter all the [green]instructions[/]. Once done, leave the instruction field [red]empty[/] and press enter");
+			AnsiConsole.MarkupLine("Enter all the [green]instructions[/]. [red] after you're done of writing instructions press space to move to next step [/]");
 			var instruction = AnsiConsole.Ask<string>("Enter instruction: ");
 			while (instruction != "")
 			{
@@ -199,13 +198,13 @@ void EditRecipe()
 				instruction = AnsiConsole.Prompt(new TextPrompt<string>("Enter instruction: ").AllowEmpty());
 			};
 			break;
-		case "Edit Categories":
+		case "Edit Category":
 			var selectedcategories = AnsiConsole.Prompt(
 			new MultiSelectionPrompt<String>()
 			.PageSize(10)
-			.Title("Which [green]categories[/] does this recipe belong to?")
+			.Title("Which [green]category[/] does this recipe belong to?")
 			.MoreChoicesText("[grey](Move up and down to reveal more categories)[/]")
-			.InstructionsText("[grey](Press [blue]Space[/] to toggle a category, [green]Enter[/] to accept)[/]")
+			.InstructionsText("[grey](Press [blue]Space[/] to toggle a category, [green]Enter[/] to choose the category you toggeled)[/]")
 			.AddChoices(categoriesList));
 
 			chosenRecipe.Categories = selectedcategories;
@@ -215,41 +214,15 @@ void EditRecipe()
 
 void AddCategory()
 {
-	categoriesList = new List<String>();
 	string category = AnsiConsole.Ask<string>("What is the [green]category[/] called?");
 	categoriesList.Add(category);
 }
 
-void RemoveCategory()
+void EditCategory()
 {
 	if (categoriesList.Count == 0)
 	{
-		AnsiConsole.MarkupLine("There are no Categories");
-		return;
-	}
-	var selectedcategories = AnsiConsole.Prompt(
-	new MultiSelectionPrompt<string>()
-	.PageSize(10)
-	.Title("Which [green]categories[/] does this recipe belong to?")
-	.MoreChoicesText("[grey](Move up and down to reveal more categories)[/]")
-	.InstructionsText("[grey](Press [blue]Space[/] to toggle a category, [green]Enter[/] to accept)[/]")
-	.AddChoices(categoriesList));
-
-	foreach (string category in selectedcategories)
-	{
-		foreach (Recipe recipe in recipesList)
-		{
-			recipe.Categories.Remove(category);
-		}
-		categoriesList.Remove(category);
-	}
-}
-
-void EditCategory()
-{
-	if (categoriesList.ElementAt(0) == null)
-	{
-		AnsiConsole.MarkupLine("[red]There are no Categories[/]");
+		AnsiConsole.MarkupLine("[red]There are no Categories to be edited[/]");
 		return;
 	}
 	var chosenCategory = AnsiConsole.Prompt(
@@ -262,12 +235,17 @@ void EditCategory()
 	categoriesList.Remove(chosenCategory);
 	categoriesList.Add(newCategoryName);
 
-	foreach (var recipe in recipesList)
+	foreach (var cat in categoriesList)
 	{
-		recipe.Categories.Remove(chosenCategory);
-		recipe.Categories.Add(newCategoryName);
+		foreach (var recipe in recipesList)
+		{
+			if (cat == chosenCategory)
+			{
+				recipe.Categories.Remove(chosenCategory);
+				recipe.Categories.Add(newCategoryName);
+			}
+		}
 	}
-
 }
 
 void ListRecipes()
@@ -280,34 +258,49 @@ void ListRecipes()
 
 	foreach (var recipe in recipesList)
 	{
+		int ingCnt = 0;
 		var ingredients = new StringBuilder();
 		foreach (String ingredient in recipe.Ingredients)
-			ingredients.Append("- " + ingredient + "\n");
+        {
+			ingCnt++;
+			ingredients.Append(ingCnt+ "-" + "[green]" + ingredient + "[/]" + "\n");
+		}
+
+		int insCnt = 0;
 		var instructions = new StringBuilder();
 		foreach (String instruction in recipe.Instructions)
-			instructions.Append("- " + instruction + "\n");
+        {
+			insCnt++;
+			instructions.Append(insCnt + "-" + instruction + "\n");
+		}
+			
+
 		var categories = new StringBuilder();
 		foreach (String category in recipe.Categories)
-			categories.Append("- " + category + "\n");
-		table.AddRow(recipe.Title, recipe.Ingredients.ToString(), recipe.Instructions.ToString(), recipe.Categories);
+		{
+			categories.Append("-" + category + "\n");
+		}
+		
+		table.AddRow(recipe.Title, ingredients.ToString(), instructions.ToString(), categories.ToString());
 	}
+
 	AnsiConsole.Write(table);
-	foreach (var recipe in recipesList)
+	/*foreach (var recipe in recipesList)
     {
 		Console.WriteLine(recipe.Title);
 		foreach (var ingredient in recipe.Ingredients)
         {
-			Console.WriteLine(ingredient);
+			AnsiConsole.WriteLine(ingredient);
         }
 		foreach (var instructions in recipe.Instructions)
         {
-
+			AnsiConsole.WriteLine(instructions);
         }
 		foreach(var categories in recipe.Categories)
         {
-			Console.WriteLine(categories);
+			AnsiConsole.WriteLine(categories);
         }
-    }
+    }*/
 
 }
 
