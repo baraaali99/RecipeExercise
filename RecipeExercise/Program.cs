@@ -36,13 +36,12 @@ while (true)
            .AddChoiceGroup("Recipes", new[]
 		   {
 			   "Add a Recipe",
-			   "Delete a Recipe",
 			   "Edit a Recipe"
 		   })
 		   .AddChoiceGroup("Categories", new[]
 		   {
 			   "Add a Category",
-			   "Delete a Category",
+
 			   "Edit a Category"
 		   })
 		   .AddChoices(new[]
@@ -126,26 +125,6 @@ void AddRecipe()
 	recipesList.Add(recipe);
 }
 
-void RemoveRecipe()
-{
-	if (recipesList.Count == 0)
-	{
-		AnsiConsole.MarkupLine("There are no Recipes");
-		return;
-	}
-	var selectedRecipes = AnsiConsole.Prompt(
-	new MultiSelectionPrompt<Recipe>()
-	.PageSize(10)
-	.Title("Which [green]recipes[/] does this recipe belong to?")
-	.MoreChoicesText("[grey](Move up and down to reveal more recipes)[/]")
-	.InstructionsText("[grey](Press [blue]Space[/] to toggle a recipe, [green]Enter[/] to accept)[/]")
-	.AddChoices(recipesList));
-
-	foreach (var recipe in selectedRecipes)
-	{
-		recipesList.Remove(recipe);
-	}
-}
 
 // incomplete
 void EditRecipe()
@@ -234,18 +213,15 @@ void EditCategory()
 
 	categoriesList.Remove(chosenCategory);
 	categoriesList.Add(newCategoryName);
-
-	foreach (var cat in categoriesList)
-	{
-		foreach (var recipe in recipesList)
-		{
-			if (cat == chosenCategory)
-			{
-				recipe.Categories.Remove(chosenCategory);
-				recipe.Categories.Add(newCategoryName);
-			}
-		}
-	}
+	int i = 0;
+	foreach(var r in recipesList)
+    {
+		if( i < recipesList.Count && i < recipesList[i].Categories.Count && r.Categories[i] == recipesList[i].Categories[i] )
+        {
+            r.Categories[i] = newCategoryName;
+        }
+		i++;
+    }
 }
 
 void ListRecipes()
@@ -285,22 +261,6 @@ void ListRecipes()
 	}
 
 	AnsiConsole.Write(table);
-	/*foreach (var recipe in recipesList)
-    {
-		Console.WriteLine(recipe.Title);
-		foreach (var ingredient in recipe.Ingredients)
-        {
-			AnsiConsole.WriteLine(ingredient);
-        }
-		foreach (var instructions in recipe.Instructions)
-        {
-			AnsiConsole.WriteLine(instructions);
-        }
-		foreach(var categories in recipe.Categories)
-        {
-			AnsiConsole.WriteLine(categories);
-        }
-    }*/
 
 }
 
