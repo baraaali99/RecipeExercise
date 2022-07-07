@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "Ingredients": [
+      "Mac",
+      "Milk",
+      "Chedder cheese"
+    ],
+    "Title": "Mac and Cheese",
+    "Instructions": [
+      "Cook elbow macaroni in the boiling water for 8 minutes.",
+      "Add Cheddar cheese and stir until melted, 2 to 4 minutes.",
+      "add milk to melted cheese",
+      "Drain macaroni and fold into cheese sauce until coated."
+    ],
+    "Categories": [
+      "Food",
+      "Pasta dish"
+    ]
+  }
+]
