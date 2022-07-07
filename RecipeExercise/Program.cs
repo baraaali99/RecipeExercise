@@ -7,10 +7,10 @@ using Newtonsoft.Json;
 
 var recipesList = new List<Recipe>();
 var categoriesList = new List<string>();
-var JsonPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-string JsonFile = Path.Combine(JsonPath, "D:\\computer science\\Silverkey\\RecipeExercise\\RecipeExercise\\Recipes.json");
+var jsonPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+string jsonFile = Path.Combine(jsonPath, "D:\\computer science\\Silverkey\\RecipeExercise\\RecipeExercise\\Recipes.json");
 
-	using (StreamReader r = new StreamReader(JsonFile))
+	using (StreamReader r = new StreamReader(jsonFile))
 	{
 		var Data = r.ReadToEnd();
 		var Json = JsonConvert.DeserializeObject<List<Recipe>>(Data);
@@ -284,5 +284,5 @@ void ListRecipes()
 
 void Save()
 {
-	File.WriteAllText(JsonFile, JsonConvert.SerializeObject(recipesList));
+	File.WriteAllText(jsonFile, JsonConvert.SerializeObject(recipesList));
 }
